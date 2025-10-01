@@ -103,9 +103,13 @@ function Auth({ register }) {
               </h1>
 
               {register ? (
-                <h5 className="text-lg mt-2 opacity-90">Sign up to your Account</h5>
+                <h5 className="text-lg mt-2 opacity-90">Sign up to your Account
+               <span className="text-xs bg-yellow-200 text-black px-2 py-0.5 rounded-md font-semibold"> Beta</span>
+                </h5>
               ) : (
-                <h5 className="text-lg mt-2 opacity-90">Sign in to your Account</h5>
+                <h5 className="text-lg mt-2 opacity-90 ">Sign in to your Account
+                 <span className=" ms-5 text-xs bg-yellow-200 text-black px-2 py-0.5 rounded-md font-semibold"> Beta</span>
+                </h5>
               )}
 
               <form className="mt-6 w-3/4 space-y-4">
