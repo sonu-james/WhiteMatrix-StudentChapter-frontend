@@ -20,21 +20,21 @@ const studyPacksData = [
   { id: 1, title: "React Study Material PDF", pdfUrl: "/study-pack/WM React Study Material (1)", skill: "Frontend", level: "Beginner" },
   { id: 2, title: "React Study Material PDF", pdfUrl: "/study-pack/WM React Study Material (1)", skill: "Frontend", level: "Intermediate" },
 
-  { id: 4, title: "AWS Lambda", pdfUrl: "#", skill: "Backend", level: "Beginner" },
-  { id: 5, title: "AWS Lambda", videoUrl: "#", skill: "Backend", level: "Intermediate" },
+  { id: 4, title: "AWS Lambda", pdfUrl: "/study-pack/AWS Lambda.pdf", skill: "Backend", level: "Beginner" },
+  { id: 5, title: "AWS Lambda", pdfUrl: "/study-pack/AWS Lambda.pdf", skill: "Backend", level: "Intermediate" },
  
 
   // Advanced Study Packs
   { id: 6, title: "Advanced React Guide", pdfUrl: "/study-pack/WM React Study Material (1)", skill: "Frontend", level: "Advanced" },
   { id: 7, title: "Frontend System Design", pdfUrl: "/study-pack/WM React Study Material (1)", skill: "Frontend", level: "Advanced" },
-  { id: 8, title: "Advanced AWS Lambda Tutorial", pdfUrl: "#", skill: "Backend", level: "Advanced" },
+  { id: 8, title: "Advanced AWS Lambda Tutorial", pdfUrl: "/study-pack/AWS Lambda.pdf", skill: "Backend", level: "Advanced" },
   { id: 9, title: "Backend Microservices", webUrl: "https://microservices.io/", skill: "Backend", level: "Advanced" },
   { id: 10, title: "Fullstack MERN Video Course", videoUrl: "https://www.youtube.com/watch?v=7CqJlxBYj-M", skill: "Fullstack", level: "Advanced" },
   { id: 11, title: "Fullstack Deployment Guide", webUrl: "https://vercel.com/docs", skill: "Fullstack", level: "Advanced" },
   { id: 12, title: "Fullstack Roadmap PDF", pdfUrl: "/study-pack/WM React Study Material (1)", skill: "Fullstack", level: "Beginner" },
-  { id: 13, title: "AWS Lambda", pdfUrl: "#", skill: "Fullstack", level: "Beginner" },
-  { id: 14, title: "Fullstack MERN Video Course", videoUrl: "#", skill: "Fullstack", level: "Intermediate" },
-  { id: 15, title: "Fullstack Deployment Guide Beginner Level", webUrl: "#", skill: "Fullstack", level: "Intermediate" },
+  { id: 13, title: "AWS Lambda", pdfUrl: "/study-pack/AWS Lambda.pdf", skill: "Fullstack", level: "Beginner" },
+  { id: 14, title: "Fullstack MERN Video Course", videoUrl: "https://youtu.be/dOVcFaYj_zA", skill: "Fullstack", level: "Intermediate" },
+  { id: 15, title: "Fullstack Deployment Guide Beginner Level", webUrl: "https://www.codechef.com/roadmap/full-stack-development", skill: "Fullstack", level: "Intermediate" },
 ];
 
 const assessmentsData = [
