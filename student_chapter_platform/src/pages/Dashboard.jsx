@@ -1,53 +1,6 @@
  "use client";
 import React, { useEffect, useState } from "react";
-
-// Dummy data
-const modulesData = [
-  { id: 1, title: "HTML & CSS Basics", description: "Intro to web design", status: "not-started", skill: "Frontend", level: "Beginner" },
-  { id: 2, title: "JavaScript Fundamentals", description: "Core JS concepts", status: "not-started", skill: "Frontend", level: "Intermediate" },
-  { id: 3, title: "React Basics", description: "Components & Props", status: "not-started", skill: "Frontend", level: "Intermediate" },
-  { id: 4, title: "AWS Lambda Basics", description: "Backend fundamentals", status: "not-started", skill: "Backend", level: "Beginner" },
-  { id: 5, title: "Advanced AWS LAmbda", description: "SQL & NoSQL", status: "not-started", skill: "Backend", level: "Intermediate" },
-  { id: 6, title: "Advanced React & Performance", description: "Hooks, Context API, Performance Optimization", status: "not-started", skill: "Frontend", level: "Advanced" },
-  { id: 7, title: "Advanced AWS LAmbda", description: "Scaling, Clustering, and Advanced APIs", status: "not-started", skill: "Backend", level: "Advanced" },
-  { id: 8, title: "Fullstack Project", description: "Build a complete MERN app", status: "not-started", skill: "Fullstack", level: "Advanced" },
-    { id: 8, title: "Fullstack Project", description: "Build a complete MERN app", status: "not-started", skill: "Fullstack", level: "Intermediate" },
-  { id: 9, title: "Intro to Fullstack Development", description: "Overview of frontend, backend, and databases", status: "not-started", skill: "Fullstack", level: "Beginner" },
-  
-];
-
-const studyPacksData = [
-  { id: 1, title: "React Study Material PDF", pdfUrl: "/study-pack/WM React Study Material (1)", skill: "Frontend", level: "Beginner" },
-  { id: 2, title: "React Study Material PDF", pdfUrl: "/study-pack/WM React Study Material (1)", skill: "Frontend", level: "Intermediate" },
-
-  { id: 4, title: "AWS Lambda", pdfUrl: "/study-pack/AWS Lambda.pdf", skill: "Backend", level: "Beginner" },
-  { id: 5, title: "AWS Lambda", pdfUrl: "/study-pack/AWS Lambda.pdf", skill: "Backend", level: "Intermediate" },
- 
-
-  // Advanced Study Packs
-  { id: 6, title: "Advanced React Guide", pdfUrl: "/study-pack/WM React Study Material (1)", skill: "Frontend", level: "Advanced" },
-  { id: 7, title: "Frontend System Design", pdfUrl: "/study-pack/WM React Study Material (1)", skill: "Frontend", level: "Advanced" },
-  { id: 8, title: "Advanced AWS Lambda Tutorial", pdfUrl: "/study-pack/AWS Lambda.pdf", skill: "Backend", level: "Advanced" },
-  { id: 9, title: "Backend Microservices", webUrl: "https://microservices.io/", skill: "Backend", level: "Advanced" },
-  { id: 10, title: "Fullstack MERN Video Course", videoUrl: "https://www.youtube.com/watch?v=7CqJlxBYj-M", skill: "Fullstack", level: "Advanced" },
-  { id: 11, title: "Fullstack Deployment Guide", webUrl: "https://vercel.com/docs", skill: "Fullstack", level: "Advanced" },
-  { id: 12, title: "Fullstack Roadmap PDF", pdfUrl: "/study-pack/WM React Study Material (1)", skill: "Fullstack", level: "Beginner" },
-  { id: 13, title: "AWS Lambda", pdfUrl: "/study-pack/AWS Lambda.pdf", skill: "Fullstack", level: "Beginner" },
-  { id: 14, title: "Fullstack MERN Video Course", videoUrl: "https://youtu.be/dOVcFaYj_zA", skill: "Fullstack", level: "Intermediate" },
-  { id: 15, title: "Fullstack Deployment Guide Beginner Level", webUrl: "https://www.codechef.com/roadmap/full-stack-development", skill: "Fullstack", level: "Intermediate" },
-];
-
-const assessmentsData = [
-  { id: 1, title: "HTML/CSS Quiz", date: "2025-10-01", score: null, skill: "Frontend", level: "Beginner" },
-  { id: 2, title: "JavaScript Test", date: "2025-10-15", score: null, skill: "Frontend", level: "Intermediate" },
-  { id: 3, title: "AWS Lambda Quiz", date: "2025-10-20", score: null, skill: "Backend", level: "Beginner" },
-   { id: 3, title: "AWS Lambda Quiz", date: "2025-10-20", score: null, skill: "Backend", level: "Intermediate" },
-  { id: 4, title: "Advanced React Challenge", date: "2025-11-01", score: null, skill: "Frontend", level: "Advanced" },
-  { id: 5, title: "Advanced Node.js Test", date: "2025-11-05", score: null, skill: "Backend", level: "Advanced" },
-  { id: 6, title: "Fullstack Final Project", date: "2025-11-15", score: null, skill: "Fullstack", level: "Advanced" },
-  { id: 7, title: "Fullstack Basics Quiz", date: "2025-10-25", score: null, skill: "Fullstack", level: "Beginner" },
-    { id: 8, title: "Fullstack Final Project", date: "2025-11-15", score: null, skill: "Fullstack", level: "intermediate" },
-];
+import internshipData from "../data/internshipData.json"; // adjust path
 
 
 export default function InternshipDashboard() {
@@ -69,7 +22,7 @@ export default function InternshipDashboard() {
       setUser(JSON.parse(storedUser));
     }
   }, []);
-
+  const { modules: modulesData, studyPacks: studyPacksData, assessments: assessmentsData } = internshipData;
   // Step 1: Skill & Track selection screen
   if (!started) {
     return (
