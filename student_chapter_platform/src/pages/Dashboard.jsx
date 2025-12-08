@@ -201,11 +201,11 @@ useEffect(() => {
           />
           <h2 className="text-xl font-semibold text-black">{user.username}</h2>
           <p className="text-black">{user.email}</p>
-          {/* <p className="text-black">{user.phone}</p>
+          <p className="text-black">{user.phone}</p>
           <div className="flex gap-2 mt-3 justify-center">
             <span className="bg-black text-white px-3 py-1 rounded-full text-sm">{user.skillLevel}</span>
             <span className="bg-black text-white px-3 py-1 rounded-full text-sm">{user.track}</span>
-          </div> */}
+          </div>
 
           <div className="mt-4">
             <button
@@ -226,14 +226,13 @@ useEffect(() => {
             >
               Logout
             </button>
-            <button
+            {/* <button
               onClick={openEditProfile}
               className="bg-gradient-to-r from-black to-cyan-400 text-white font-semibold px-4 py-2 rounded-full text-sm w-40 shadow-md hover:scale-105 transition-all duration-200"
             >
               Edit Profile
-            </button>
+            </button> */}
             
-
           </div>
         </div>
 
