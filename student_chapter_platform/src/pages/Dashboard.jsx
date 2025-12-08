@@ -1,6 +1,7 @@
- "use client";
+"use client";
 import React, { useEffect, useState } from "react";
 import internshipData from "../data/internshipData.json"; // adjust path
+import EditProfileModal from "../components/EditProfileModal";
 
 
 export default function InternshipDashboard() {
@@ -11,18 +12,96 @@ export default function InternshipDashboard() {
     skillLevel: "",
     track: "",
     linkedinUrl: "",
+    avatarDataUrl: null,
   });
 
+  
+  
   const [started, setStarted] = useState(false); // Control flow with Start button
   const [modules, setModules] = useState([]);
-  
-  useEffect(() => {
+  const [showEditProfile, setShowEditProfile] = useState(false);
+
+
+useEffect(() => {
+  try {
     const storedUser = sessionStorage.getItem("existingUser");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    
+    console.log(storedUser);
+    // 🧠 Avoid parsing "undefined" or invalid JSON
+    if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
+      const parsedUser = JSON.parse(storedUser);
+      if (parsedUser && typeof parsedUser === "object") {
+        setUser(parsedUser);
+      } else {
+        console.warn("Invalid user object in sessionStorage");
+      }
+    } else {
+      console.warn("No valid user found in sessionStorage");
     }
-  }, []);
+  } catch (err) {
+    console.error("Error parsing stored user:", err);
+  }
+}, []);
+
+
   const { modules: modulesData, studyPacks: studyPacksData, assessments: assessmentsData } = internshipData;
+   const [editForm, setEditForm] = useState({ ...user });
+  useEffect(() => setEditForm({ ...user }), [user, showEditProfile]);
+
+  const fileToDataUrl = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      setEditForm((prev) => ({ ...prev, avatarDataUrl: dataUrl }));
+    } catch (err) {
+      console.error("Failed to read file", err);
+    }
+  };
+
+  const openEditProfile = () => {
+    setEditForm({ ...user });
+    setShowEditProfile(true);
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditProfile(false);
+    setEditForm({ ...user });
+  };
+
+  const handleSaveProfile = () => {
+    if (!editForm.username || !editForm.email) {
+      alert("Please provide at least a name and email.");
+      return;
+    }
+
+    try {
+      sessionStorage.setItem("existingUser", JSON.stringify(editForm));
+    } catch (err) {
+      console.warn("Failed to save to sessionStorage", err);
+    }
+
+    setUser(editForm);
+
+    // re-init modules if skill/track changed
+    if (editForm.skillLevel && editForm.track) {
+      const filtered = modulesData.filter(
+        (m) => m.skill === editForm.track && m.level === editForm.skillLevel
+      );
+      setModules(filtered);
+    }
+
+    setShowEditProfile(false);
+  };
+
   // Step 1: Skill & Track selection screen
   if (!started) {
     return (
@@ -116,17 +195,17 @@ export default function InternshipDashboard() {
         {/* Profile Card */}
         <div className="bg-white/90 backdrop-blur-md shadow-xl rounded-2xl p-5 text-center relative border border-black/20">
           <img
-            src={`https://ui-avatars.com/api/?name=${user.username}&background=14b8a6&color=fff`}
+            src={`https://ui-avatars.com/api/?name=${user?.username}&background=14b8a6&color=fff`}
             alt="profile"
             className="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-black"
           />
           <h2 className="text-xl font-semibold text-black">{user.username}</h2>
           <p className="text-black">{user.email}</p>
-          <p className="text-black">{user.phone}</p>
+          {/* <p className="text-black">{user.phone}</p>
           <div className="flex gap-2 mt-3 justify-center">
             <span className="bg-black text-white px-3 py-1 rounded-full text-sm">{user.skillLevel}</span>
             <span className="bg-black text-white px-3 py-1 rounded-full text-sm">{user.track}</span>
-          </div>
+          </div> */}
 
           <div className="mt-4">
             <button
@@ -147,50 +226,58 @@ export default function InternshipDashboard() {
             >
               Logout
             </button>
+            <button
+              onClick={openEditProfile}
+              className="bg-gradient-to-r from-black to-cyan-400 text-white font-semibold px-4 py-2 rounded-full text-sm w-40 shadow-md hover:scale-105 transition-all duration-200"
+            >
+              Edit Profile
+            </button>
+            
+
           </div>
         </div>
 
         {/* Study Packs */}
-      <div className="bg-white/90 backdrop-blur-md shadow-xl rounded-2xl p-5 border border-black/20">
-  <h3 className="font-semibold mb-3 text-lg text-black">Study Packs</h3>
-  <ul className="space-y-2">
-    {filteredStudyPacks.map((pack) => (
-      <li key={pack.id} className="flex justify-between items-center text-black">
-        <span>{pack.title}</span>
+        <div className="bg-white/90 backdrop-blur-md shadow-xl rounded-2xl p-5 border border-black/20">
+          <h3 className="font-semibold mb-3 text-lg text-black">Study Packs</h3>
+          <ul className="space-y-2">
+            {filteredStudyPacks.map((pack) => (
+              <li key={pack.id} className="flex justify-between items-center text-black">
+                <span>{pack.title}</span>
 
-        {pack.pdfUrl && pack.pdfUrl !== "#" ? (
-          <a
-            href={pack.pdfUrl}
-            download
-            className="text-cyan-600 hover:underline"
-          >
-            📄 Download
-          </a>
-        ) : pack.webUrl ? (
-          <a
-            href={pack.webUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
-          >
-            🌐 Website
-          </a>
-        ) : pack.videoUrl && pack.videoUrl !== "#" ? (
-          <a
-            href={pack.videoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-red-600 hover:underline"
-          >
-            🎥 Video
-          </a>
-        ) : (
-          <span className="text-gray-500 italic">Coming Soon</span>
-        )}
-      </li>
-    ))}
-  </ul>
-</div>
+                {pack.pdfUrl && pack.pdfUrl !== "#" ? (
+                  <a
+                    href={pack.pdfUrl}
+                    download
+                    className="text-cyan-600 hover:underline"
+                  >
+                    📄 Download
+                  </a>
+                ) : pack.webUrl ? (
+                  <a
+                    href={pack.webUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    🌐 Website
+                  </a>
+                ) : pack.videoUrl && pack.videoUrl !== "#" ? (
+                  <a
+                    href={pack.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-red-600 hover:underline"
+                  >
+                    🎥 Video
+                  </a>
+                ) : (
+                  <span className="text-gray-500 italic">Coming Soon</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
 
       </div>
 
@@ -221,23 +308,23 @@ export default function InternshipDashboard() {
                 {m.status === "not-started" && <span className="text-gray-600">Not Started</span>}
 
                 {/* Dropdown to change status */}
-             <select
-  value={m.status}
-  onChange={(e) => {
-    const newModules = [...modules];
-    newModules[index].status = e.target.value;
-    setModules(newModules);
-  }}
-  className={`ml-2 p-2 rounded-full border border-cyan-300 bg-white text-sm font-medium shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all duration-200 cursor-pointer
+                <select
+                  value={m.status}
+                  onChange={(e) => {
+                    const newModules = [...modules];
+                    newModules[index].status = e.target.value;
+                    setModules(newModules);
+                  }}
+                  className={`ml-2 p-2 rounded-full border border-cyan-300 bg-white text-sm font-medium shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all duration-200 cursor-pointer
     ${m.status === "complete" ? "text-green-600" :
-      m.status === "in-progress" ? "text-yellow-600" :
-      "text-gray-600"
-    }`}
->
-  <option value="not-started">Not Started</option>
-  <option value="in-progress">In Progress</option>
-  <option value="complete">Complete</option>
-</select>
+                      m.status === "in-progress" ? "text-yellow-600" :
+                        "text-gray-600"
+                    }`}
+                >
+                  <option value="not-started">Not Started</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="complete">Complete</option>
+                </select>
 
               </div>
             </div>
@@ -261,7 +348,7 @@ export default function InternshipDashboard() {
           </ul>
         </div>
 
-         {/* LinkedIn Integration */}
+        {/* LinkedIn Integration */}
         <div className="bg-white/90 backdrop-blur-md shadow-xl rounded-2xl p-5 flex flex-col gap-2 border border-black/20">
           <h3 className="text-xl font-bold mb-3 text-black">LinkedIn Integration</h3>
           <p className="mb-2 break-all text-black">Profile: {user.linkedinUrl}</p>
@@ -275,6 +362,15 @@ export default function InternshipDashboard() {
           </div>
         </div>
       </div>
+
+      <EditProfileModal
+        show={showEditProfile}
+        editForm={editForm}
+        setEditForm={setEditForm}
+        onSave={handleSaveProfile}
+        onCancel={handleCancelEdit}
+        handleAvatarChange={handleAvatarChange}
+      />
     </div>
   );
 }

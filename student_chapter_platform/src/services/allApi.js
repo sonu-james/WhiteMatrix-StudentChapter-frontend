@@ -1,13 +1,40 @@
+import { commonApi } from "./commonApi";
+import { serverUrl } from "./serverUrl";
 
-import { commonApi } from "./commonApi"
-import {serverUrl} from "./serverUrl"
-//register
-export const registerApi = async(reqBody)=>{
-  return  await commonApi('POST',`${serverUrl}/register`,reqBody,"")
-}
+// =========================
+// 🔹 Register API
+// =========================
+export const registerApi = async (reqBody) => {
+  try {
+    const response = await commonApi("POST", `${serverUrl}/register`, reqBody, "");
+    return response;
+  } catch (error) {
+    return error.response;
+  }
+};
 
-//login
+// =========================
+// 🔹 Login API
+// =========================
+export const loginApi = async (reqBody) => {
+  return await commonApi("POST", `${serverUrl}/login`, reqBody, "");
+};
 
-export const loginApi= async(reqBody)=>{
-  return await commonApi('POST',`${serverUrl}/login`,reqBody,"")
-}
+// =========================
+// 🔹 Forgot Password APIs
+// =========================
+
+// 1️⃣ Send OTP
+export const sendOtpApi = async (data) => {
+  return await commonApi("POST", `${serverUrl}/send-otp`, data, "");
+};
+
+// 2️⃣ Verify OTP
+export const verifyOtpApi = async (data) => {
+  return await commonApi("POST", `${serverUrl}/verify-otp`, data, "");
+};
+
+// 3️⃣ Reset Password
+export const resetPasswordApi = async (data) => {
+  return await commonApi("POST", `${serverUrl}/reset-password`, data, "");
+};
