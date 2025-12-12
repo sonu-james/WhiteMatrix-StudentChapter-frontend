@@ -38,3 +38,17 @@ export const verifyOtpApi = async (data) => {
 export const resetPasswordApi = async (data) => {
   return await commonApi("POST", `${serverUrl}/reset-password`, data, "");
 };
+
+// =========================
+// 🔹 Profile Update Api
+// =========================
+export const profileUpdateApi =async(data,reqHeader)=>{
+  return await commonApi("PUT",`${serverUrl}/update-profile`,data,reqHeader);
+}
+
+// 🔹 Profile info Api
+// =========================
+export const profileInfoApi =async(reqHeader)=>{
+  return await commonApi("GET",`${serverUrl}/profile-Info`,"",reqHeader);
+}
+

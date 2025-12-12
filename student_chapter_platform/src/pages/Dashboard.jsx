@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import internshipData from "../data/internshipData.json"; // adjust path
 import EditProfileModal from "../components/EditProfileModal";
-
+import { profileInfoApi, profileUpdateApi } from "../services/allApi";
 
 export default function InternshipDashboard() {
   const [user, setUser] = useState({
@@ -11,8 +11,11 @@ export default function InternshipDashboard() {
     phone: "",
     skillLevel: "",
     track: "",
-    linkedinUrl: "",
+    linkedin: "",
+    college:"",
+    github:"",
     avatarDataUrl: null,
+    profile:"",
   });
 
   
@@ -23,29 +26,51 @@ export default function InternshipDashboard() {
 
 
 useEffect(() => {
-  try {
-    const storedUser = sessionStorage.getItem("existingUser");
-    
-    console.log(storedUser);
-    // 🧠 Avoid parsing "undefined" or invalid JSON
-    if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
-      const parsedUser = JSON.parse(storedUser);
-      if (parsedUser && typeof parsedUser === "object") {
-        setUser(parsedUser);
-      } else {
-        console.warn("Invalid user object in sessionStorage");
-      }
-    } else {
-      console.warn("No valid user found in sessionStorage");
+  let mounted = true;
+
+  // 1️⃣ Load from sessionStorage first (fast UI load)
+  // try {
+  //   const storedUser = sessionStorage.getItem("existingUser");
+  //   if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
+  //     const parsedUser = JSON.parse(storedUser);
+  //     if (parsedUser && typeof parsedUser === "object") {
+  //       setUser(parsedUser);
+  //     }
+  //   }
+  // } catch (err) {
+  //   console.error("Error parsing stored user:", err);
+  // }
+
+  // 2️⃣ Then fetch fresh user data from backend (using your own API)
+  (async () => {
+    try {
+      const token = sessionStorage.getItem("token") || localStorage.getItem("token") || "";
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const res = await profileInfoApi(headers); 
+      console.log(res);
+      setUser(res.data.user)
+      // const freshUser = res?.user || res;
+
+      // if (mounted && freshUser) {
+      //   setUser(freshUser);
+      //   sessionStorage.setItem("existingUser", JSON.stringify(freshUser));
+      // }
+    } catch (err) {
+      console.warn("Failed to fetch fresh profile:", err);
     }
-  } catch (err) {
-    console.error("Error parsing stored user:", err);
-  }
+  })();
+
+  return () => {
+    mounted = false;
+  };
 }, []);
+
+console.log(user.phone);
 
 
   const { modules: modulesData, studyPacks: studyPacksData, assessments: assessmentsData } = internshipData;
-   const [editForm, setEditForm] = useState({ ...user });
+  const [editForm, setEditForm] = useState({ ...user });
   useEffect(() => setEditForm({ ...user }), [user, showEditProfile]);
 
   const fileToDataUrl = (file) =>
@@ -56,16 +81,16 @@ useEffect(() => {
       reader.readAsDataURL(file);
     });
 
-  const handleAvatarChange = async (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    try {
-      const dataUrl = await fileToDataUrl(file);
-      setEditForm((prev) => ({ ...prev, avatarDataUrl: dataUrl }));
-    } catch (err) {
-      console.error("Failed to read file", err);
-    }
-  };
+  // const handleAvatarChange = async (e) => {
+  //   const file = e.target.files && e.target.files[0];
+  //   if (!file) return;
+  //   try {
+  //     const dataUrl = await fileToDataUrl(file);
+  //     setEditForm((prev) => ({ ...prev, avatarDataUrl: dataUrl }));
+  //   } catch (err) {
+  //     console.error("Failed to read file", err);
+  //   }
+  // };
 
   const openEditProfile = () => {
     setEditForm({ ...user });
@@ -77,30 +102,79 @@ useEffect(() => {
     setEditForm({ ...user });
   };
 
-  const handleSaveProfile = () => {
-    if (!editForm.username || !editForm.email) {
-      alert("Please provide at least a name and email.");
+  // const handleSaveProfile = () => {
+  //   if (!editForm.username || !editForm.email) {
+  //     alert("Please provide at least a name and email.");
+  //     return;
+  //   }
+    
+  //   try {
+  //     sessionStorage.setItem("existingUser", JSON.stringify(editForm));
+  //   } catch (err) {
+  //     console.warn("Failed to save to sessionStorage", err);
+  //   }
+
+  //   setUser(editForm);
+
+  //   // re-init modules if skill/track changed
+  //   if (editForm.skillLevel && editForm.track) {
+  //     const filtered = modulesData.filter(
+  //       (m) => m.skill === editForm.track && m.level === editForm.skillLevel
+  //     );
+  //     setModules(filtered);
+  //   }
+
+  //   setShowEditProfile(false);
+  // };
+
+const handleSaveProfile = async () => {
+  if (!editForm.username || !editForm.email) {
+    alert("Please provide at least a name and email.");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("username", editForm.username);
+    formData.append("email", editForm.email);
+    formData.append("phone", editForm.phone || "");
+    formData.append("linkedin", editForm.linkedin || "");
+    formData.append("college", editForm.college || "");
+    formData.append("github", editForm.github || "");
+    formData.append("profile", editForm.profile || ""); // fallback if you store a string path
+    formData.append("skillLevel", editForm.skillLevel || "");
+    formData.append("track", editForm.track || "");
+
+    // If you have a File object for avatar, append it as 'profile' so multer.single('profile') gets it
+    if (editForm.avatarFile instanceof File) {
+      formData.set("profile", editForm.avatarFile); // overwrite the string fallback with actual File
+    }
+
+    // Get token (try both storages)
+    const token = sessionStorage.getItem("token") || localStorage.getItem("token") || "";
+
+    // IMPORTANT: do NOT set Content-Type when sending FormData
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    const res = await profileUpdateApi(formData, headers);
+     const updatedUser = res?.user || res;
+     if (!updatedUser) {
+      alert(res?.message || "Profile updated (no user returned)");
+      // setShowEditProfile(false);
       return;
     }
-
-    try {
-      sessionStorage.setItem("existingUser", JSON.stringify(editForm));
-    } catch (err) {
-      console.warn("Failed to save to sessionStorage", err);
-    }
-
-    setUser(editForm);
-
-    // re-init modules if skill/track changed
-    if (editForm.skillLevel && editForm.track) {
-      const filtered = modulesData.filter(
-        (m) => m.skill === editForm.track && m.level === editForm.skillLevel
-      );
-      setModules(filtered);
-    }
-
     setShowEditProfile(false);
-  };
+  } catch (err) {
+    console.warn("Failed to save profile", err);
+    // prefer server message if available
+    const serverMsg = err?.message || (err?.response && err.response?.data?.message);
+    alert(serverMsg || "Failed to update profile. Please try again.");
+  }
+};
+
+
 
   // Step 1: Skill & Track selection screen
   if (!started) {
@@ -226,12 +300,12 @@ useEffect(() => {
             >
               Logout
             </button>
-            {/* <button
+            <button
               onClick={openEditProfile}
               className="bg-gradient-to-r from-black to-cyan-400 text-white font-semibold px-4 py-2 rounded-full text-sm w-40 shadow-md hover:scale-105 transition-all duration-200"
             >
               Edit Profile
-            </button> */}
+            </button>
             
           </div>
         </div>
@@ -368,7 +442,7 @@ useEffect(() => {
         setEditForm={setEditForm}
         onSave={handleSaveProfile}
         onCancel={handleCancelEdit}
-        handleAvatarChange={handleAvatarChange}
+        // handleAvatarChange={handleAvatarChange}
       />
     </div>
   );
