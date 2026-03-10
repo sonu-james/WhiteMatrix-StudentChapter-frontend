@@ -25,6 +25,7 @@ function Auth({ register }) {
     "Christ College (Autonomous), Irinjalakuda",
     "Sahrdaya College of Engineering & Technology",
     "Rajagiri School of Engineering & Technology (in Kochi, Kerala)",
+    "Rajagiri College of Social Sciences",
     "Amrita Vishwa Vidyapeetham",
     "Government Engineering College, Thrissur",
     "Government Engineering College, Thiruvananthapuram",
